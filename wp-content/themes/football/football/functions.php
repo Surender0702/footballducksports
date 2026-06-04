@@ -920,20 +920,63 @@ function football_image_url($image_field, $fallback = '') {
     return $fallback;
 }
 
-function football_youtube_embed_url($url) {
+function football_youtube_channel_id() {
+    return 'UCu7Tukr3uUrr87FMG3sf1iA';
+}
+
+function football_youtube_channel_url() {
+    return 'https://www.youtube.com/@DuckSportsFootballAcademy';
+}
+
+function football_youtube_uploads_playlist_id($channel_id = '') {
+    $channel_id = $channel_id ?: football_youtube_channel_id();
+
+    if (strpos($channel_id, 'UC') === 0) {
+        return 'UU' . substr($channel_id, 2);
+    }
+
+    return $channel_id;
+}
+
+function football_youtube_uploads_embed_url($channel_id = '') {
+    return add_query_arg(
+        array(
+            'list' => football_youtube_uploads_playlist_id($channel_id),
+            'rel'  => '0',
+        ),
+        'https://www.youtube.com/embed/videoseries'
+    );
+}
+
+function football_youtube_video_id($url) {
     if (!$url) {
         return '';
     }
 
     $parts = wp_parse_url($url);
     $video_id = '';
+    $path = trim((string) ($parts['path'] ?? ''), '/');
 
     if (!empty($parts['host']) && strpos($parts['host'], 'youtu.be') !== false) {
-        $video_id = trim($parts['path'] ?? '', '/');
+        $video_id = strtok($path, '/');
     } elseif (!empty($parts['query'])) {
         parse_str($parts['query'], $query);
         $video_id = $query['v'] ?? '';
     }
+
+    if (!$video_id && $path) {
+        $path_parts = explode('/', $path);
+
+        if (in_array($path_parts[0], array('embed', 'live', 'shorts'), true) && !empty($path_parts[1])) {
+            $video_id = $path_parts[1];
+        }
+    }
+
+    return preg_replace('/[^A-Za-z0-9_-]/', '', (string) $video_id);
+}
+
+function football_youtube_embed_url($url) {
+    $video_id = football_youtube_video_id($url);
 
     return $video_id ? 'https://www.youtube.com/embed/' . rawurlencode($video_id) : '';
 }
