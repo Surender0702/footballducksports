@@ -28,12 +28,12 @@
                     echo wp_get_attachment_image($custom_logo_id, 'full', false, array('class' => 'custom-logo'));
                     ?>
                 <?php else : ?>
-                    <span class="academy-brand__mark" aria-hidden="true">FD</span>
-                    <span class="academy-brand__text">
-                        <strong><?php bloginfo('name'); ?></strong>
-                        <small><?php esc_html_e('Football Academy', 'football'); ?></small>
-                    </span>
+                    <img src="<?php echo esc_url(content_url('/uploads/2026/08/logo.png')); ?>" alt="<?php bloginfo('name'); ?>" class="custom-logo academy-logo-img">
                 <?php endif; ?>
+                <span class="academy-brand__text">
+                    <strong><?php bloginfo('name'); ?></strong>
+                    <small><?php echo get_bloginfo('description') ? esc_html(get_bloginfo('description')) : esc_html__('Football Academy', 'football'); ?></small>
+                </span>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="<?php esc_attr_e('Toggle navigation', 'football'); ?>">

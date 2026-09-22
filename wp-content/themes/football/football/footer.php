@@ -2,8 +2,9 @@
     <div class="container">
         <div class="row g-4 align-items-start">
             <div class="col-lg-5">
-                <a class="footer-brand" href="<?php echo esc_url(home_url('/')); ?>">
-                    <?php bloginfo('name'); ?>
+                <a class="footer-brand d-inline-flex align-items-center gap-3" href="<?php echo esc_url(home_url('/')); ?>">
+                    <img src="<?php echo esc_url(content_url('/uploads/2026/08/logo.png')); ?>" alt="<?php bloginfo('name'); ?>" class="footer-logo-img" style="max-height: 48px; width: auto;">
+                    <span><?php bloginfo('name'); ?></span>
                 </a>
                 <p><?php esc_html_e('Professional youth football coaching focused on technique, discipline, confidence, and match readiness.', 'football'); ?></p>
             </div>

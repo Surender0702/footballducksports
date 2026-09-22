@@ -132,36 +132,75 @@
         </div>
     </section>
 
+    <?php
+    $program_query = new WP_Query(
+        array(
+            'post_type'      => 'training_program',
+            'posts_per_page' => -1,
+            'post_status'    => 'publish',
+            'orderby'        => array(
+                'menu_order' => 'ASC',
+                'date'       => 'DESC',
+            ),
+            'no_found_rows'  => true,
+        )
+    );
+
+    $program_items = array();
+
+    if ($program_query->have_posts()) {
+        while ($program_query->have_posts()) {
+            $program_query->the_post();
+
+            $program_description = football_get_field('training_program_description', get_the_ID());
+            $description = $program_description ?: (has_excerpt() ? get_the_excerpt() : wp_trim_words(wp_strip_all_tags(get_the_content()), 24));
+
+            $program_items[] = array(
+                'label'       => football_get_field('training_program_label', get_the_ID()),
+                'title'       => get_the_title(),
+                'description' => $description,
+                'featured'    => (bool) football_get_field('training_program_featured', get_the_ID()),
+            );
+        }
+
+        wp_reset_postdata();
+    }
+
+    if (empty($program_items)) {
+        $program_items = football_default_training_programs();
+    }
+
+    $training_pathway_heading = football_get_training_pathway_heading();
+    ?>
+
     <section id="programs" class="academy-section academy-section--programs">
         <div class="container">
             <div class="section-heading">
-                <span class="section-kicker"><?php esc_html_e('Training Pathway', 'football'); ?></span>
-                <h2><?php esc_html_e('Programs for every stage of a player journey', 'football'); ?></h2>
-                <p><?php esc_html_e('A clear development pathway helps players build technique first, then pressure handling, decision-making, and match rhythm.', 'football'); ?></p>
+                <?php if (!empty($training_pathway_heading['kicker'])) : ?>
+                    <span class="section-kicker"><?php echo esc_html($training_pathway_heading['kicker']); ?></span>
+                <?php endif; ?>
+                <?php if (!empty($training_pathway_heading['title'])) : ?>
+                    <h2><?php echo esc_html($training_pathway_heading['title']); ?></h2>
+                <?php endif; ?>
+                <?php if (!empty($training_pathway_heading['description'])) : ?>
+                    <p><?php echo esc_html($training_pathway_heading['description']); ?></p>
+                <?php endif; ?>
             </div>
 
             <div class="row g-4">
-                <div class="col-md-4">
-                    <article class="program-card">
-                        <span class="program-card__label">U-8 to U-11</span>
-                        <h3><?php esc_html_e('Foundation Training', 'football'); ?></h3>
-                        <p><?php esc_html_e('First touch, passing habits, coordination, balance, and joy on the ball.', 'football'); ?></p>
-                    </article>
-                </div>
-                <div class="col-md-4">
-                    <article class="program-card program-card--featured">
-                        <span class="program-card__label">U-12 to U-15</span>
-                        <h3><?php esc_html_e('Skill Development', 'football'); ?></h3>
-                        <p><?php esc_html_e('Dribbling under pressure, positional play, finishing, defensive shape, and team play.', 'football'); ?></p>
-                    </article>
-                </div>
-                <div class="col-md-4">
-                    <article class="program-card">
-                        <span class="program-card__label">Advanced</span>
-                        <h3><?php esc_html_e('Match Preparation', 'football'); ?></h3>
-                        <p><?php esc_html_e('Game intelligence, speed endurance, set-piece discipline, and tournament readiness.', 'football'); ?></p>
-                    </article>
-                </div>
+                <?php foreach ($program_items as $program_item) : ?>
+                    <div class="col-md-6 col-lg-4">
+                        <article class="<?php echo esc_attr('program-card' . (!empty($program_item['featured']) ? ' program-card--featured' : '')); ?>">
+                            <?php if (!empty($program_item['label'])) : ?>
+                                <span class="program-card__label"><?php echo esc_html($program_item['label']); ?></span>
+                            <?php endif; ?>
+                            <h3><?php echo esc_html($program_item['title']); ?></h3>
+                            <?php if (!empty($program_item['description'])) : ?>
+                                <p><?php echo esc_html($program_item['description']); ?></p>
+                            <?php endif; ?>
+                        </article>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
